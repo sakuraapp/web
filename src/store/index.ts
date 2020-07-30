@@ -8,6 +8,7 @@ import axios from 'helpers/axios'
 Vue.use(Vuex)
 
 const RECONNECT_INTERVAL = 15 * 1000 // 15s
+const env = process.env.NODE_ENV || 'development'
 
 interface Packet {
     op: number
@@ -55,7 +56,7 @@ interface BrowserMessage {
 }
 
 interface PlayerState {
-    currentDuration?: number
+    currentTime?: number
     url?: string
     playing: boolean
 }
@@ -88,7 +89,7 @@ export const initialState = (): State => {
 
 export const initialPlayerState = (): PlayerState => {
     return {
-        currentDuration: 0,
+        currentTime: 0,
         url: null,
         playing: false,
     }
@@ -111,15 +112,26 @@ export const getters: GetterTree<State, null> = {
 }
 
 export const mutations: MutationTree<State> = {
-    handleToken(state, token: string) {
-        if (token) {
-            cookies.set('token', token, {
-                expires: 365,
-                secure: process.env.NODE_ENV !== 'development',
-                domain: process.env.COOKIE_DOMAIN,
-            })
-        } else {
-            cookies.erase('token')
+    handleToken(
+        state,
+        {
+            token,
+            save = false,
+        }: {
+            token: string
+            save: boolean
+        }
+    ) {
+        if (save) {
+            if (token) {
+                cookies.set('token', token, {
+                    expires: 365,
+                    secure: env !== 'development',
+                    domain: process.env.COOKIE_DOMAIN,
+                })
+            } else {
+                cookies.erase('token')
+            }
         }
 
         state.token = token
@@ -226,8 +238,8 @@ export const mutations: MutationTree<State> = {
         state.player.playing = playing
     },
 
-    handleSetCurrentDuration(state, duration: number) {
-        state.player.currentDuration = duration
+    handleSetCurrentTime(state, time: number) {
+        state.player.currentTime = time
     },
 
     handleSetURL(state, url: string) {
@@ -249,7 +261,7 @@ export const mutations: MutationTree<State> = {
         }
     },
 
-    setupWindow() {
+    setupWindow(state) {
         this.dispatch('sendWindowMessage', { action: 'sakura-init' })
 
         window.addEventListener('message', (event: MessageEvent) => {
@@ -257,13 +269,20 @@ export const mutations: MutationTree<State> = {
 
             const data: BrowserMessage = event.data
 
+            if (!data.action || !data.action.startsWith('sakura-')) return
+
             switch (data.action) {
                 case 'sakura-window-poll':
-                    this.dispatch('sendWindowMeessage', data)
+                    this.dispatch('sendWindowMessage', data)
                     break
                 case 'sakura-join-room':
                     this.dispatch('handleJoinRoomRequest', data)
                     break
+                case 'sakura-get-state':
+                    this.dispatch('sendWindowMessage', {
+                        action: 'sakura-player-state',
+                        state: state.player,
+                    })
             }
         })
     },
@@ -314,10 +333,7 @@ export const mutations: MutationTree<State> = {
                         const player = packet.d as PlayerState
 
                         this.commit('handleSetPlaying', player.playing)
-                        this.commit(
-                            'handleSetCurrentDuration',
-                            player.currentDuration
-                        )
+                        this.commit('handleSetCurrentTime', player.currentTime)
                         this.commit('handleSetURL', player.url)
                     }
                     break
@@ -363,6 +379,10 @@ export const actions: ActionTree<State, null> = {
         }
 
         return token
+    },
+
+    sendWindowMessage(store, message: unknown) {
+        window.postMessage(message, window.location.origin)
     },
 
     sendWebSocket(store, data: Packet) {

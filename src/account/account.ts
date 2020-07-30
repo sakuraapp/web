@@ -36,13 +36,13 @@ export default class AccountService {
     }
 
     static logout(): void {
-        return store.commit('handleToken', null)
+        return store.commit('handleToken', { token: null, save: true })
     }
 
     static async fetchToken(): Promise<string> {
         const token: string = await store.dispatch('getToken')
 
-        store.commit('handleToken', token)
+        store.commit('handleToken', { token })
 
         return token
     }
