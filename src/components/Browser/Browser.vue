@@ -274,7 +274,7 @@ export default Vue.extend({
     font-family: Source Sans Pro;
 }
 .browser .content .addressBar button {
-    width: 7vh;
+    width: 2.5em;
     display: flex;
     justify-content: center;
     align-items: center;
