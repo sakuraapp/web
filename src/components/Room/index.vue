@@ -5,7 +5,11 @@
             <Logo />
             Waiting for something to play...
         </div>
-        <Browser @close="handleCloseBrowser" v-if="showBrowser" :asPopup="browserPopup" />
+        <Browser
+            @close="handleCloseBrowser"
+            v-if="showBrowser"
+            :asPopup="browserPopup"
+        />
         <Sidebar @queueAddClick="handleShowBrowser" />
     </div>
 </template>
@@ -23,14 +27,16 @@ export default Vue.extend({
         Logo,
         Sidebar,
         Webview,
-        Browser
+        Browser,
     },
     data() {
         return { browserPopup: false }
     },
     computed: {
         showBrowser() {
-            return (!this.player.url || this.browserPopup) && this.room.isOwnRoom
+            return (
+                (!this.player.url || this.browserPopup) && this.room.isOwnRoom
+            )
         },
         showPlaceholder() {
             return !this.player.url && !this.room.isOwnRoom
@@ -45,7 +51,7 @@ export default Vue.extend({
         },
         handleCloseBrowser() {
             this.browserPopup = false
-        }
+        },
     },
 })
 </script>

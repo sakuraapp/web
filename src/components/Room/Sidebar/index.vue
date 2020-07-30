@@ -54,8 +54,8 @@ export default Vue.extend({
         },
         addToQueue() {
             this.$emit('queueAddClick')
-        }
-    }
+        },
+    },
 })
 </script>
 

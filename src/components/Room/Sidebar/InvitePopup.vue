@@ -3,7 +3,13 @@
         <div class="header">
             Invite Link
         </div>
-        <input type="text" :value="inviteUrl" ref="input" @click="copy" readonly />
+        <input
+            type="text"
+            :value="inviteUrl"
+            ref="input"
+            @click="copy"
+            readonly
+        />
     </Popup>
 </template>
 
@@ -31,8 +37,8 @@ export default Vue.extend({
         },
         close() {
             this.$emit('close')
-        }
-    }
+        },
+    },
 })
 </script>
 

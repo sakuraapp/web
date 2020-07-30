@@ -1,10 +1,15 @@
 <template>
     <div id="roomMenu">
         <div class="error" v-if="error">
-            {{error}}
+            {{ error }}
         </div>
         <form @submit="joinRoom">
-            <input v-model="roomId" type="text" placeholder="enter room code" :disabled="busy" />
+            <input
+                v-model="roomId"
+                type="text"
+                placeholder="enter room code"
+                :disabled="busy"
+            />
             <button class="roomMenuButton" :disabled="busy">
                 <div class="icon">
                     <FontAwesomeIcon icon="arrow-right" />
@@ -24,7 +29,6 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { State } from '~/store'
 
 export default Vue.extend({
     data() {
@@ -52,23 +56,18 @@ export default Vue.extend({
 
             this.busy = true
             this.$store.dispatch('createRoom')
-        }
+        },
     },
     mounted() {
         this.unsubscribe = this.$store.subscribe(
-            (
-                mutation: {
-                    type: string
-                    payload: unknown
-                },
-                state: State
-            ): void => {
+            (mutation: { type: string; payload: unknown }): void => {
                 switch (mutation.type) {
                     case 'handleJoinRoom':
                         this.busy = false
                         break
                     case 'handlePrivateRoom':
-                        this.error = 'Room is private. Waiting for host to accept your request to join the room...'
+                        this.error =
+                            'Room is private. Waiting for host to accept your request to join the room...'
                         break
                     case 'handleRoomNotFound':
                         this.error = 'Room not found.'
@@ -79,13 +78,7 @@ export default Vue.extend({
         )
 
         this.unsubscribeAction = this.$store.subscribeAction(
-            (
-                action: {
-                    type: string,
-                    payload: unknown
-                },
-                state: State
-            ): void => {
+            (action: { type: string; payload: unknown }): void => {
                 if (action.type === 'joinRoom') {
                     this.busy = true
                 }
@@ -95,12 +88,13 @@ export default Vue.extend({
     beforeDestroy() {
         this.unsubscribe()
         this.unsubscribeAction()
-    }
+    },
 })
 </script>
 
 <style>
-#roomMenu, #roomMenu form{
+#roomMenu,
+#roomMenu form {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -112,7 +106,7 @@ export default Vue.extend({
 }
 
 #roomMenu .error {
-    color: #DC3737;
+    color: #dc3737;
     font-weight: bold;
     margin-bottom: 0.8em;
 }
@@ -123,7 +117,7 @@ export default Vue.extend({
     margin-bottom: 1.4em;
 }
 #roomMenu form .roomMenuButton {
-    width: 100%
+    width: 100%;
 }
 
 .roomMenuButton {
@@ -144,7 +138,7 @@ export default Vue.extend({
     position: relative;
 }
 .roomMenuButton:not(:disabled):hover {
-    background-color: #2E2E2E;
+    background-color: #2e2e2e;
 }
 .roomMenuButton:disabled {
     color: grey;
@@ -157,7 +151,7 @@ export default Vue.extend({
     left: 30px;
 }
 
-#roomMenu input[type="text"] {
+#roomMenu input[type='text'] {
     background-color: transparent;
     color: #fff;
     padding: 0.4em;
@@ -180,15 +174,16 @@ export default Vue.extend({
     text-transform: uppercase;
     margin-bottom: 1.2em;
 }
-.lineSeparator::before, .lineSeparator::after {
+.lineSeparator::before,
+.lineSeparator::after {
     content: '';
     flex: 1;
-    border-bottom: 1px solid #4B4B4B;
+    border-bottom: 1px solid #4b4b4b;
 }
 .lineSeparator::before {
-    margin-right: .25em;
+    margin-right: 0.25em;
 }
 .lineSeparator::after {
-    margin-left: .25em;
+    margin-left: 0.25em;
 }
 </style>

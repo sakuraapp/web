@@ -1,14 +1,9 @@
 <template>
     <div id="profile" :class="{ userProfile: true, right: alignRight }">
-        <div
-            class="avatar"
-            :style="`backgroundImage: url('${avatar}')`"
-        ></div>
+        <div class="avatar" :style="`backgroundImage: url('${avatar}')`"></div>
         <div class="info">
-            <div class="username">{{username}}</div>
-            <div class="discriminator">
-                #{{discriminator}}
-            </div>
+            <div class="username">{{ username }}</div>
+            <div class="discriminator">#{{ discriminator }}</div>
         </div>
     </div>
 </template>
@@ -18,7 +13,9 @@ import Vue from 'vue'
 
 export default Vue.extend({
     props: ['user', 'alignRight'],
-    data() { return this.user }
+    data() {
+        return this.user
+    },
 })
 </script>
 

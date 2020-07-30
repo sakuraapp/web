@@ -29,8 +29,8 @@ export default Vue.extend({
     methods: {
         addToQueue() {
             this.$emit('queueAddClick')
-        }
-    }
+        },
+    },
 })
 </script>
 

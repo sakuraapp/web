@@ -2,10 +2,14 @@
     <div class="container">
         <div id="header" v-if="!room">
             <Logo />
-            <Profile :user=myUser />
+            <Profile :user="myUser" />
         </div>
         <div id="body">
-            <InviteView :room="invitation.room" @close="hideInvite" v-if="invitation" />
+            <InviteView
+                :room="invitation.room"
+                @close="hideInvite"
+                v-if="invitation"
+            />
             <RoomMenu v-else-if="!room" />
             <Room v-else />
         </div>
@@ -27,7 +31,7 @@ export default Vue.extend({
         Profile,
         RoomMenu,
         Room,
-        InviteView
+        InviteView,
     },
     data() {
         return {
@@ -38,8 +42,8 @@ export default Vue.extend({
     methods: {
         hideInvite() {
             this.$store.commit('cancelRoomInvitation')
-        }
-    }
+        },
+    },
 })
 </script>
 

@@ -1,10 +1,5 @@
 <template>
-    <iframe
-        :src="url"
-        ref="iframe"
-        :allow="featurePolicy"
-        :name="name"
-    />
+    <iframe :src="url" ref="iframe" :allow="featurePolicy" :name="name" />
 </template>
 
 <script lang="ts">
@@ -28,7 +23,9 @@ export default Vue.extend({
                 'picture-in-picture',
                 'fullscreen',
                 'autoplay',
-            ].map(feature => `${feature} *`).join('; ')
+            ]
+                .map((feature) => `${feature} *`)
+                .join('; '),
         }
     },
     methods: {
@@ -54,12 +51,12 @@ export default Vue.extend({
         },
         setURL(url: string) {
             this.src = url
-        }
+        },
     },
     watch: {
         src(val: string) {
             this.url = val
-        }
+        },
     },
     mounted() {
         window.addEventListener('message', this.handleMessage)
@@ -68,7 +65,7 @@ export default Vue.extend({
     },
     beforeDestroy() {
         window.removeEventListener('message', this.handleMessage)
-    }
+    },
 })
 </script>
 

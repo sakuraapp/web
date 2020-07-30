@@ -5,7 +5,7 @@
         </div>
         <div class="body">
             <div class="name">
-                {{group.author.username}}
+                {{ group.author.username }}
             </div>
             <div class="content">
                 <div
@@ -13,7 +13,7 @@
                     :key="message.id"
                     :class="{ unsent: !message.id }"
                 >
-                    {{message.content}}
+                    {{ message.content }}
                 </div>
             </div>
         </div>
@@ -24,7 +24,7 @@
 import Vue from 'vue'
 
 export default Vue.extend({
-    props: ['group']
+    props: ['group'],
 })
 </script>
 

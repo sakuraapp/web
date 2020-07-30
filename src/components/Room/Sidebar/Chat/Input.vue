@@ -24,7 +24,7 @@ export default Vue.extend({
             this.$store.dispatch('submitMessage', this.message)
             this.message = ''
         },
-    }
+    },
 })
 </script>
 

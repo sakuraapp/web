@@ -9,18 +9,19 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapGetters } from 'vuex'
-import { State } from '~/store'
 import Message from './Message.vue'
 
 export default Vue.extend({
     components: {
-        Message
+        Message,
     },
     computed: mapGetters(['messages']),
     methods: {
         updateMessages(force = false) {
             const $messages = this.$refs.messages
-            const diff = $messages.scrollHeight - ($messages.scrollTop + $messages.clientHeight)
+            const diff =
+                $messages.scrollHeight -
+                ($messages.scrollTop + $messages.clientHeight)
 
             if (force || diff < 200) {
                 $messages.scrollTop = $messages.scrollHeight
@@ -29,17 +30,15 @@ export default Vue.extend({
     },
     mounted() {
         this.unsubscribe = this.$store.subscribe(
-            (
-                mutation: {
-                    type: string
-                    payload: {
-                        author: string
-                    }
-                },
-                state: State
-            ) => {
+            (mutation: {
+                type: string
+                payload: {
+                    author: string
+                }
+            }) => {
                 if (mutation.type === 'addMessage') {
-                    const isOwnMessage = mutation.payload.author === this.$store.state.user.id
+                    const isOwnMessage =
+                        mutation.payload.author === this.$store.state.user.id
 
                     this.$nextTick(() => {
                         this.updateMessages(isOwnMessage)
@@ -50,7 +49,7 @@ export default Vue.extend({
     },
     beforeDestroy() {
         this.unsubscribe()
-    }
+    },
 })
 </script>
 

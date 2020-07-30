@@ -1,15 +1,13 @@
 <template>
     <div class="item">
-        <div class="position">
-            {{position}}.
-        </div>
+        <div class="position">{{ position }}.</div>
         <img :src="item.icon" />
         <div class="info">
             <div class="title">
-                {{item.title}}
+                {{ item.title }}
             </div>
             <div class="author">
-                Added by <b>{{item.author.username}}</b>
+                Added by <b>{{ item.author.username }}</b>
             </div>
         </div>
     </div>
@@ -22,7 +20,7 @@ export default Vue.extend({
     props: ['item', 'position'],
     mounted() {
         console.log(this.item)
-    }
+    },
 })
 </script>
 

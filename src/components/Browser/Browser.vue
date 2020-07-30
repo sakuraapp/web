@@ -3,18 +3,31 @@
         <div class="content" v-if="!url">
             <slot />
             <div class="addressBar">
-                <input type="text" placeholder="Type a URL" v-model="address" @keyup.enter="navigateToAddress" />
+                <input
+                    type="text"
+                    placeholder="Type a URL"
+                    v-model="address"
+                    @keyup.enter="navigateToAddress"
+                />
                 <button @click="addToQueue(true)">
                     <FontAwesomeIcon icon="plus-circle" />
                 </button>
             </div>
             <div class="sites">
-                <div class="site" v-for="site in sites" :key="site.title" @click="navigate(site.url)">
+                <div
+                    class="site"
+                    v-for="site in sites"
+                    :key="site.title"
+                    @click="navigate(site.url)"
+                >
                     <div class="icon">
-                        <img :src="site.icon" :style="{ height: site.height }" />
+                        <img
+                            :src="site.icon"
+                            :style="{ height: site.height }"
+                        />
                     </div>
                     <div class="title">
-                        {{site.title}}
+                        {{ site.title }}
                     </div>
                 </div>
             </div>
@@ -33,7 +46,11 @@
                     </button>
                 </div>
                 <div class="input">
-                    <input type="text" v-model="address" @keypress.enter="navigateToAddress" />
+                    <input
+                        type="text"
+                        v-model="address"
+                        @keypress.enter="navigateToAddress"
+                    />
                 </div>
                 <div class="btn">
                     <button @click="addToQueue">
@@ -59,14 +76,16 @@ import Webview from '../Webview.vue'
 export default Vue.extend({
     props: ['isPopup'],
     components: {
-        Webview
+        Webview,
     },
     methods: {
         navigate(url: string, appendForward = false, changeSrc = true) {
             if (this.url) {
-                const target = appendForward ? this.history.forward : this.history.back
+                const target = appendForward
+                    ? this.history.forward
+                    : this.history.back
 
-                if(target[target.length - 1] !== this.url) {
+                if (target[target.length - 1] !== this.url) {
                     target.push(this.url)
                 }
             }
@@ -93,7 +112,7 @@ export default Vue.extend({
         },
         refresh() {
             const src = this.src
-    
+
             this.src = ''
 
             this.$nextTick(() => {
@@ -113,18 +132,21 @@ export default Vue.extend({
         },
         close() {
             this.$emit('close')
-        }
+        },
     },
-    mounted() {        
+    mounted() {
         if (this.url) {
             this.navigate(this.url, false, false)
         }
 
-        this.unwatch = this.$watch('$refs.webview.currentURL', (value: string) => {
-            if (value !== this.url) {
-                this.navigate(value, false, false)
+        this.unwatch = this.$watch(
+            '$refs.webview.currentURL',
+            (value: string) => {
+                if (value !== this.url) {
+                    this.navigate(value, false, false)
+                }
             }
-        })
+        )
     },
     beforeDestroy() {
         this.unwatch()
@@ -135,7 +157,7 @@ export default Vue.extend({
         },
         canGoForward() {
             return this.history.forward.length > 0
-        }
+        },
     },
     data() {
         return {
@@ -144,7 +166,7 @@ export default Vue.extend({
             address: '',
             history: {
                 back: [],
-                forward: []
+                forward: [],
             },
             sites: [
                 {
@@ -156,21 +178,21 @@ export default Vue.extend({
                 {
                     title: 'Twitch',
                     icon: require('~/assets/icons/Twitch.png'),
-                    url: 'https://twitch.tv'
+                    url: 'https://twitch.tv',
                 },
                 {
                     title: 'Netflix',
                     icon: require('~/assets/icons/Netflix.png'),
-                    url: 'https://netflix.com'
+                    url: 'https://netflix.com',
                 },
                 {
                     title: 'Crunchyroll',
                     icon: require('~/assets/icons/Crunchyroll.png'),
-                    url: 'https://crunchyroll.com'
-                }
-            ]
+                    url: 'https://crunchyroll.com',
+                },
+            ],
         }
-    }
+    },
 })
 </script>
 
@@ -179,7 +201,7 @@ export default Vue.extend({
     flex-grow: 1;
     font-size: 1.8em;
     background-color: rgba(49, 49, 49, 0.7);
-    position: relative
+    position: relative;
 }
 .browser .addressBar button,
 .browser .addressBar input {

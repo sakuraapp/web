@@ -8,7 +8,8 @@
                 Invitation
             </div>
             <div class="message">
-                You have been invited to <b class="owner">{{room.owner}}'s</b> room.
+                You have been invited to
+                <b class="owner">{{ room.owner }}'s</b> room.
             </div>
             <button @click="join">Continue</button>
         </div>
@@ -27,8 +28,8 @@ export default Vue.extend({
         },
         decline() {
             this.$store.commit('handleRoomInvitation', null)
-        }
-    }
+        },
+    },
 })
 </script>
 

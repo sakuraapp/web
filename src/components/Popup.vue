@@ -1,5 +1,11 @@
 <template>
-    <component v-if="component" :isPopup="true" :class="classAttr" :is="component" @close="close">
+    <component
+        v-if="component"
+        :isPopup="true"
+        :class="classAttr"
+        :is="component"
+        @close="close"
+    >
         <div class="closeBtn" @click="close">
             &times;
         </div>
@@ -31,12 +37,12 @@ export default Vue.extend({
                 flex: isPropTrue(this.flexbox),
                 center: isPropTrue(this.center),
             }
-        }
+        },
     },
     methods: {
         close() {
             this.$emit('close')
-        }
+        },
     },
 })
 </script>

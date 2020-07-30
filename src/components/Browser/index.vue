@@ -20,7 +20,7 @@ export default Vue.extend({
     methods: {
         close() {
             this.$emit('close')
-        }
-    }
+        },
+    },
 })
 </script>
