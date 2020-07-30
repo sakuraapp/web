@@ -1,17 +1,11 @@
 <template>
-    <div class="container">
+    <div id="container">
         <div id="header" v-if="!room">
             <Logo />
-            <Profile :user="myUser" />
+            <Profile v-if="user" :user="user" />
         </div>
         <div id="body">
-            <InviteView
-                :room="invitation.room"
-                @close="hideInvite"
-                v-if="invitation"
-            />
-            <RoomMenu v-else-if="!room" />
-            <Room v-else />
+            <router-view id="view" />
         </div>
     </div>
 </template>
@@ -21,34 +15,18 @@ import Vue from 'vue'
 import { mapState } from 'vuex'
 import Logo from './Logo.vue'
 import Profile from './Profile.vue'
-import RoomMenu from './RoomMenu.vue'
-import Room from './Room/index.vue'
-import InviteView from './InviteView.vue'
 
 export default Vue.extend({
     components: {
         Logo,
         Profile,
-        RoomMenu,
-        Room,
-        InviteView,
     },
-    data() {
-        return {
-            myUser: this.$store.state.user,
-        }
-    },
-    computed: mapState(['room', 'invitation']),
-    methods: {
-        hideInvite() {
-            this.$store.commit('cancelRoomInvitation')
-        },
-    },
+    computed: mapState(['room', 'user', 'invitation']),
 })
 </script>
 
 <style>
-.container {
+#container {
     width: 100%;
     height: 100%;
     display: flex;
@@ -75,7 +53,13 @@ export default Vue.extend({
     flex-grow: 1;
     height: 100%;
     display: flex;
+}
+
+#view {
+    display: flex;
     justify-content: center;
     align-items: center;
+    flex-grow: 1;
+    height: 100%;
 }
 </style>
