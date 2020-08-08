@@ -1,6 +1,8 @@
 <template>
     <div class="room">
-        <Webview v-if="player.url" :src="player.url" />
+        <Player v-if="player.url">
+            <Webview :src="player.url" v-show="showPlayer" />
+        </Player>
         <div class="placeholderScreen" v-if="showPlaceholder">
             <Logo />
             Waiting for something to play...
@@ -17,8 +19,11 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
+import { hasPermission } from 'helpers/permission'
+import { isDevelopment } from 'helpers/util'
 import Logo from '../Logo.vue'
 import Sidebar from './Sidebar/index.vue'
+import Player from './Player/index.vue'
 import Webview from '../Webview.vue'
 import Browser from '../Browser/index.vue'
 
@@ -26,6 +31,7 @@ export default Vue.extend({
     components: {
         Logo,
         Sidebar,
+        Player,
         Webview,
         Browser,
     },
@@ -33,13 +39,17 @@ export default Vue.extend({
         return { browserPopup: false }
     },
     computed: {
+        showPlayer() {
+            return isDevelopment() || this.player.ready
+        },
         showBrowser() {
             return (
-                (!this.player.url || this.browserPopup) && this.room.isOwnRoom
+                (!this.player.url || this.browserPopup) &&
+                hasPermission('QUEUE_ADD')
             )
         },
         showPlaceholder() {
-            return !this.player.url && !this.room.isOwnRoom
+            return !this.player.url && !hasPermission('QUEUE_ADD')
         },
         ...mapState(['room', 'player']),
     },

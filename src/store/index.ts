@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex, { GetterTree, MutationTree, ActionTree } from 'vuex'
 import cookies from 'browser-cookies'
 import AccountService, { User } from 'account/account'
-import Opcodes from '../../../common/opcodes.json'
+import Opcodes from '@common/opcodes.json'
 import axios from 'helpers/axios'
 
 Vue.use(Vuex)
@@ -41,7 +41,7 @@ interface Room {
     users: Array<string>
     messages: Array<MessageGroup>
     queue: Array<QueueItem>
-    isOwnRoom: boolean
+    permissions: Array<number>
 }
 
 interface RoomInfo {
@@ -55,10 +55,28 @@ interface BrowserMessage {
     action: string
 }
 
+interface WebviewEvent {
+    type: string
+    target: string
+    data: unknown
+    t?: number
+}
+
+interface CaptionTrack {
+    id: string
+    label: string
+    active: boolean
+}
+
 interface PlayerState {
+    ready: boolean
+    duration: number
     currentTime?: number
-    url?: string
+    volume: number
+    url: string
     playing: boolean
+    captions: Array<CaptionTrack>
+    updateInterval?: number
 }
 
 export interface State {
@@ -89,9 +107,13 @@ export const initialState = (): State => {
 
 export const initialPlayerState = (): PlayerState => {
     return {
+        ready: false,
+        duration: 0,
         currentTime: 0,
+        volume: 1,
         url: null,
         playing: false,
+        captions: [],
     }
 }
 
@@ -152,6 +174,7 @@ export const mutations: MutationTree<State> = {
             id: string
             owner: string
             users: Array<User>
+            permissions: Array<number>
         }
     ) {
         if (data) {
@@ -165,7 +188,6 @@ export const mutations: MutationTree<State> = {
                 users: data.users.map((user: User) => user.id),
                 messages: [],
                 queue: [],
-                isOwnRoom: data.owner === state.user.id,
             })
             state.player = initialPlayerState()
         } else {
@@ -235,11 +257,50 @@ export const mutations: MutationTree<State> = {
     },
 
     handleSetPlaying(state, playing: boolean) {
-        state.player.playing = playing
+        const { player } = state
+
+        player.playing = playing
+
+        if (player.updateInterval) {
+            clearInterval(player.updateInterval)
+            player.updateInterval = null
+        }
+
+        if (playing) {
+            player.updateInterval = window.setInterval(
+                () => player.currentTime++,
+                1000
+            )
+        }
+
+        this.dispatch('sendToPlayer', {
+            event: {
+                type: 'set-playing',
+                data: playing,
+            },
+        })
     },
 
     handleSetCurrentTime(state, time: number) {
         state.player.currentTime = time
+
+        this.dispatch('sendToPlayer', {
+            event: {
+                type: 'seek',
+                data: time,
+            },
+        })
+    },
+
+    handleSetVolume(state, volume: number) {
+        state.player.volume = volume
+
+        this.dispatch('sendToPlayer', {
+            event: {
+                type: 'set-volume',
+                data: volume,
+            },
+        })
     },
 
     handleSetURL(state, url: string) {
@@ -261,7 +322,7 @@ export const mutations: MutationTree<State> = {
         }
     },
 
-    setupWindow(state) {
+    setupWindow() {
         this.dispatch('sendWindowMessage', { action: 'sakura-init' })
 
         window.addEventListener('message', (event: MessageEvent) => {
@@ -278,11 +339,8 @@ export const mutations: MutationTree<State> = {
                 case 'sakura-join-room':
                     this.dispatch('handleJoinRoomRequest', data)
                     break
-                case 'sakura-get-state':
-                    this.dispatch('sendWindowMessage', {
-                        action: 'sakura-player-state',
-                        state: state.player,
-                    })
+                case 'sakura-webview-event':
+                    this.dispatch('handleWebviewEvent', data)
             }
         })
     },
@@ -302,6 +360,7 @@ export const mutations: MutationTree<State> = {
 
         ws.onmessage = (e: MessageEvent) => {
             const packet: Packet = JSON.parse(e.data)
+            const latency = new Date().getTime() - packet.t
 
             switch (packet.op) {
                 case Opcodes.AUTHENTICATE:
@@ -333,7 +392,10 @@ export const mutations: MutationTree<State> = {
                         const player = packet.d as PlayerState
 
                         this.commit('handleSetPlaying', player.playing)
-                        this.commit('handleSetCurrentTime', player.currentTime)
+                        this.dispatch('handleSeek', {
+                            time: player.currentTime,
+                            latency,
+                        })
                         this.commit('handleSetURL', player.url)
                     }
                     break
@@ -342,6 +404,7 @@ export const mutations: MutationTree<State> = {
                     break
                 case Opcodes.QUEUE_REMOVE:
                     this.commit('handleQueueRemove', packet.d)
+                    break
             }
         }
 
@@ -385,6 +448,23 @@ export const actions: ActionTree<State, null> = {
         window.postMessage(message, window.location.origin)
     },
 
+    sendWebviewEvent(store, { event }) {
+        store.dispatch('sendWindowMessage', {
+            action: 'sakura-webview-event',
+            ...event,
+        })
+    },
+
+    sendToPlayer(store, { event }: { event: WebviewEvent }) {
+        if (!event.t) {
+            event.t = new Date().getTime()
+        }
+
+        event.target = 'player'
+
+        store.dispatch('sendWebviewEvent', { event })
+    },
+
     sendWebSocket(store, data: Packet) {
         if (!data.t) {
             data.t = new Date().getTime()
@@ -424,6 +504,26 @@ export const actions: ActionTree<State, null> = {
             })
     },
 
+    handleWebviewEvent(store, evt: WebviewEvent) {
+        switch (evt.type) {
+            case 'video-ready':
+                {
+                    const { player } = store.state
+                    const data = evt.data as {
+                        volume: number
+                        duration: number
+                        captions: Array<CaptionTrack>
+                    }
+
+                    player.volume = data.volume
+                    player.duration = data.duration
+                    player.captions = data.captions
+                    player.ready = true
+                }
+                break
+        }
+    },
+
     submitMessage(store, content: string) {
         const message: Message = {
             content,
@@ -461,6 +561,48 @@ export const actions: ActionTree<State, null> = {
             op: Opcodes.QUEUE_ADD,
             d: url,
         })
+    },
+
+    skip(store) {
+        store.dispatch('sendWebSocket', {
+            op: Opcodes.QUEUE_REMOVE,
+        })
+    },
+
+    setPlaying(store, value: boolean) {
+        store.commit('handleSetPlaying', value)
+        store.dispatch('sendWebSocket', {
+            op: Opcodes.PLAYER_STATE,
+            d: {
+                playing: value,
+            },
+        })
+    },
+
+    seek(store, time: number) {
+        if (time < 0) time = 0
+        else if (time > store.state.player.duration)
+            time = store.state.player.duration
+
+        store.commit('handleSetCurrentTime', time)
+        store.dispatch('sendWebSocket', {
+            op: Opcodes.PLAYER_STATE,
+            d: {
+                currentTime: time,
+            },
+        })
+    },
+
+    setVolume(store, value: number) {
+        if (value < 0) value = 0
+        else if (value > 1) value = 1
+
+        store.commit('handleSetVolume', value)
+    },
+
+    handleSeek(store, { time, latency }: { time: number; latency: number }) {
+        console.log(store.state.player.currentTime, time + latency / 1000)
+        store.commit('handleSetCurrentTime', time + latency / 1000)
     },
 }
 

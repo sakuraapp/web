@@ -10,8 +10,8 @@
             &times;
         </div>
     </component>
-    <div :class="classAttr" v-else>
-        <div class="content">
+    <div :class="classAttr" @click="onClick" v-else>
+        <div class="content" ref="content">
             <div class="closeBtn" @click="close">
                 &times;
             </div>
@@ -40,6 +40,11 @@ export default Vue.extend({
         },
     },
     methods: {
+        onClick(e: MouseEvent) {
+            if (e.composedPath()[0] === this.$refs.content) {
+                this.close()
+            }
+        },
         close() {
             this.$emit('close')
         },

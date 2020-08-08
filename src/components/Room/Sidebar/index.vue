@@ -8,14 +8,14 @@
             </div>
         </div>
         <div class="subHeader">
-            <a :class="{ active: tab === 'chat' }" @click="setTab('chat')">
+            <div :class="{ active: tab === 'chat' }" @click="setTab('chat')">
                 <FontAwesomeIcon icon="comments" />
                 <span>Chat</span>
-            </a>
-            <a :class="{ active: tab === 'queue' }" @click="setTab('queue')">
+            </div>
+            <div :class="{ active: tab === 'queue' }" @click="setTab('queue')">
                 <FontAwesomeIcon icon="list" />
                 <span>Queue</span>
-            </a>
+            </div>
         </div>
         <InvitePopup @close="invitePopup = false" v-if="invitePopup" />
         <Chat v-if="tab === 'chat'" />
@@ -99,24 +99,24 @@ export default Vue.extend({
     color: lightgrey;
     border-bottom: 1px solid rgb(40, 40, 40);
 }
-.sidebar .subHeader a {
+.sidebar .subHeader div {
     padding: 0.6em;
     flex: 1;
     cursor: pointer;
 }
-.sidebar .subHeader a.active {
+.sidebar .subHeader div.active {
     color: #fff;
     font-weight: bold;
 }
-.sidebar .subHeader a:not(:last-child) {
+.sidebar .subHeader div:not(:last-child) {
     border-right: 1px solid #404040;
     padding-right: 0.4em;
 }
-.sidebar .subHeader a:last-child {
+.sidebar .subHeader div:last-child {
     padding-left: 0.4em;
 }
-.sidebar .subHeader a i,
-.sidebar .subHeader a svg {
+.sidebar .subHeader div i,
+.sidebar .subHeader div svg {
     margin-right: 0.5em;
 }
 </style>

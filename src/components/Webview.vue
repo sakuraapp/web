@@ -1,5 +1,11 @@
 <template>
-    <iframe :src="url" ref="iframe" :allow="featurePolicy" :name="name" />
+    <iframe
+        :src="url"
+        ref="iframe"
+        :allow="featurePolicy"
+        :sandbox="sandbox"
+        :name="name"
+    />
 </template>
 
 <script lang="ts">
@@ -8,7 +14,7 @@ import Vue from 'vue'
 let frameId = 0
 
 export default Vue.extend({
-    props: ['src'],
+    props: ['src', 'sandbox'],
     data() {
         const id = ++frameId
 
@@ -32,6 +38,7 @@ export default Vue.extend({
         handleMessage(e: MessageEvent) {
             const msg: {
                 action: string
+                type: string
                 data: {
                     tabId?: number
                     frameId?: number
@@ -39,14 +46,17 @@ export default Vue.extend({
                 }
             } = e.data
 
-            switch (msg.action) {
-                case 'sakura-webview-init':
-                    this.tabId = msg.data.tabId
-                    this.frameId = msg.data.frameId
+            if (msg.action === 'sakura-webview-event') {
+                switch (msg.type) {
+                    case 'init':
+                        this.tabId = msg.data.tabId
+                        this.frameId = msg.data.frameId
 
-                    break
-                case 'sakura-webview-will-navigate':
-                    this.currentURL = msg.data.url
+                        break
+                    case 'will-navigate':
+                        this.currentURL = msg.data.url
+                        break
+                }
             }
         },
         setURL(url: string) {

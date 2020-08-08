@@ -15,6 +15,9 @@ import './index.css'
 library.add(fas)
 
 Vue.component('FontAwesomeIcon', FontAwesomeIcon)
+Vue.directive('visible', (el, binding) => {
+    el.style.visibility = binding.value ? 'visible' : 'hidden'
+})
 Vue.prototype.$axios = axios
 
 new Vue({

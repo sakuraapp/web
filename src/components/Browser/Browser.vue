@@ -1,6 +1,6 @@
 <template>
     <div class="browser">
-        <div class="content" v-if="!url">
+        <div class="content" ref="content" v-if="!url" @click="onClick">
             <slot />
             <div class="addressBar">
                 <input
@@ -133,6 +133,11 @@ export default Vue.extend({
         close() {
             this.$emit('close')
         },
+        onClick(e: MouseEvent) {
+            if (e.composedPath()[0] === this.$refs.content) {
+                this.close()
+            }
+        },
     },
     mounted() {
         if (this.url) {
@@ -143,6 +148,10 @@ export default Vue.extend({
             '$refs.webview.currentURL',
             (value: string) => {
                 if (value !== this.url) {
+                    if (value.startsWith('about:blank')) {
+                        return
+                    }
+
                     this.navigate(value, false, false)
                 }
             }
@@ -183,12 +192,12 @@ export default Vue.extend({
                 {
                     title: 'Netflix',
                     icon: require('~/assets/icons/Netflix.png'),
-                    url: 'https://netflix.com',
+                    url: 'https://www.netflix.com/browse',
                 },
                 {
                     title: 'Crunchyroll',
                     icon: require('~/assets/icons/Crunchyroll.png'),
-                    url: 'https://crunchyroll.com',
+                    url: 'https://www.crunchyroll.com/videos/anime',
                 },
             ],
         }

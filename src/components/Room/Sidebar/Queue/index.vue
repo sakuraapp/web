@@ -1,6 +1,6 @@
 <template>
     <div class="queue">
-        <div class="queueBtn" @click="addToQueue">
+        <div class="queueBtn" v-if="hasPermission" @click="addToQueue">
             <div class="icon">
                 <FontAwesomeIcon icon="plus" />
             </div>
@@ -19,13 +19,19 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapGetters } from 'vuex'
+import { hasPermission } from 'helpers/permission'
 import QueueItem from './Item.vue'
 
 export default Vue.extend({
     components: {
         QueueItem,
     },
-    computed: mapGetters(['queue']),
+    computed: {
+        hasPermission() {
+            return hasPermission('QUEUE_ADD')
+        },
+        ...mapGetters(['queue']),
+    },
     methods: {
         addToQueue() {
             this.$emit('queueAddClick')
