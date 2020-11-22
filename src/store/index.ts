@@ -58,6 +58,7 @@ interface BrowserMessage {
 interface WebviewEvent {
     type: string
     target: string
+    targetFrameId?: number
     data: unknown
     t?: number
 }
@@ -76,13 +77,18 @@ interface PlayerState {
     url: string
     playing: boolean
     captions: Array<CaptionTrack>
+    itemId: number
+    isLivestream: boolean
     updateInterval?: number
+    lastUpdate?: number
 }
 
 export interface State {
+    ready: boolean
     token: string
     user: User
     users: Map<string, User>
+    socketId: string
     room: Room
     invitation: { room: RoomInfo }
     player: PlayerState
@@ -93,9 +99,11 @@ export interface State {
 
 export const initialState = (): State => {
     return {
+        ready: false,
         token: null,
         user: null,
         users: new Map<string, User>(),
+        socketId: null,
         room: null,
         invitation: null,
         player: null,
@@ -112,8 +120,11 @@ export const initialPlayerState = (): PlayerState => {
         currentTime: 0,
         volume: 1,
         url: null,
+        itemId: null,
         playing: false,
+        isLivestream: false,
         captions: [],
+        lastUpdate: null,
     }
 }
 
@@ -134,6 +145,10 @@ export const getters: GetterTree<State, null> = {
 }
 
 export const mutations: MutationTree<State> = {
+    handleReady(state, ready) {
+        state.ready = ready
+    },
+
     handleToken(
         state,
         {
@@ -174,6 +189,7 @@ export const mutations: MutationTree<State> = {
             id: string
             owner: string
             users: Array<User>
+            queue: Array<QueueItem>
             permissions: Array<number>
         }
     ) {
@@ -187,7 +203,7 @@ export const mutations: MutationTree<State> = {
             state.room = Object.assign(data, {
                 users: data.users.map((user: User) => user.id),
                 messages: [],
-                queue: [],
+                queue: data.queue,
             })
             state.player = initialPlayerState()
         } else {
@@ -283,13 +299,9 @@ export const mutations: MutationTree<State> = {
 
     handleSetCurrentTime(state, time: number) {
         state.player.currentTime = time
+        state.player.lastUpdate = new Date().getTime()
 
-        this.dispatch('sendToPlayer', {
-            event: {
-                type: 'seek',
-                data: time,
-            },
-        })
+        this.dispatch('seekVideo', { time })
     },
 
     handleSetVolume(state, volume: number) {
@@ -304,7 +316,16 @@ export const mutations: MutationTree<State> = {
     },
 
     handleSetURL(state, url: string) {
+        if (state.player.url !== url) {
+            state.player.ready = false
+            state.player.isLivestream = false
+        }
+
         state.player.url = url
+    },
+
+    handleSetActiveItemId(state, id: number) {
+        state.player.itemId = id
     },
 
     addMessage(state, message: Message) {
@@ -323,8 +344,6 @@ export const mutations: MutationTree<State> = {
     },
 
     setupWindow() {
-        this.dispatch('sendWindowMessage', { action: 'sakura-init' })
-
         window.addEventListener('message', (event: MessageEvent) => {
             if (event.source != window) return
 
@@ -333,6 +352,9 @@ export const mutations: MutationTree<State> = {
             if (!data.action || !data.action.startsWith('sakura-')) return
 
             switch (data.action) {
+                case 'sakura-initiated':
+                    this.commit('handleReady', true)
+                    break
                 case 'sakura-window-poll':
                     this.dispatch('sendWindowMessage', data)
                     break
@@ -343,6 +365,8 @@ export const mutations: MutationTree<State> = {
                     this.dispatch('handleWebviewEvent', data)
             }
         })
+
+        this.dispatch('sendWindowMessage', { action: 'sakura-init' })
     },
 
     setupWebSocket(state) {
@@ -368,7 +392,10 @@ export const mutations: MutationTree<State> = {
                         AccountService.logout()
                         AccountService.openLogin()
                     } else {
+                        const info = packet.d as { socketId: string }
+
                         state.connected = true
+                        state.socketId = info.socketId
                     }
                     break
                 case Opcodes.JOIN_ROOM:
@@ -391,12 +418,20 @@ export const mutations: MutationTree<State> = {
                     {
                         const player = packet.d as PlayerState
 
+                        this.commit('handleSetActiveItemId', player.itemId)
                         this.commit('handleSetPlaying', player.playing)
                         this.dispatch('handleSeek', {
                             time: player.currentTime,
                             latency,
                         })
                         this.commit('handleSetURL', player.url)
+                    }
+                    break
+                case Opcodes.SEND_MESSAGE:
+                    {
+                        const message = packet.d as Message
+
+                        this.commit('addMessage', message)
                     }
                     break
                 case Opcodes.QUEUE_ADD:
@@ -465,6 +500,12 @@ export const actions: ActionTree<State, null> = {
         store.dispatch('sendWebviewEvent', { event })
     },
 
+    sendToFrame(store, { event }: { event: WebviewEvent }) {
+        event.target = 'frame'
+
+        store.dispatch('sendWebviewEvent', { event })
+    },
+
     sendWebSocket(store, data: Packet) {
         if (!data.t) {
             data.t = new Date().getTime()
@@ -482,6 +523,7 @@ export const actions: ActionTree<State, null> = {
     },
 
     leaveRoom(store): void {
+        store.commit('handleRoom', null)
         store.dispatch('sendWebSocket', { op: Opcodes.LEAVE_ROOM })
     },
 
@@ -513,13 +555,28 @@ export const actions: ActionTree<State, null> = {
                         volume: number
                         duration: number
                         captions: Array<CaptionTrack>
+                        isLivestream: boolean
                     }
 
                     player.volume = data.volume
                     player.duration = data.duration
                     player.captions = data.captions
+                    player.isLivestream = data.isLivestream
                     player.ready = true
+
+                    const { state } = store
+
+                    store.dispatch('seekVideo', {
+                        time: state.player.currentTime,
+                        date: state.player.lastUpdate,
+                    })
                 }
+                break
+            case 'video-ended':
+                store.dispatch('sendWebSocket', {
+                    op: Opcodes.VIDEO_END,
+                    d: store.state.player.itemId,
+                })
                 break
         }
     },
@@ -563,9 +620,17 @@ export const actions: ActionTree<State, null> = {
         })
     },
 
-    skip(store) {
+    queueRemove(store, item: QueueItem) {
+        store.commit('handleQueueRemove', item.id)
         store.dispatch('sendWebSocket', {
             op: Opcodes.QUEUE_REMOVE,
+            d: item.id,
+        })
+    },
+
+    skip(store) {
+        store.dispatch('sendWebSocket', {
+            op: Opcodes.VIDEO_SKIP,
         })
     },
 
@@ -593,6 +658,25 @@ export const actions: ActionTree<State, null> = {
         })
     },
 
+    seekVideo(
+        store,
+        {
+            time,
+            date,
+        }: {
+            time: number
+            date?: number
+        }
+    ) {
+        store.dispatch('sendToPlayer', {
+            event: {
+                type: 'seek',
+                data: time,
+                t: date,
+            },
+        })
+    },
+
     setVolume(store, value: number) {
         if (value < 0) value = 0
         else if (value > 1) value = 1
@@ -601,7 +685,6 @@ export const actions: ActionTree<State, null> = {
     },
 
     handleSeek(store, { time, latency }: { time: number; latency: number }) {
-        console.log(store.state.player.currentTime, time + latency / 1000)
         store.commit('handleSetCurrentTime', time + latency / 1000)
     },
 }

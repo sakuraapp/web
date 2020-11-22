@@ -5,6 +5,7 @@
         :allow="featurePolicy"
         :sandbox="sandbox"
         :name="name"
+        referrerpolicy="origin"
     />
 </template>
 
@@ -14,7 +15,16 @@ import Vue from 'vue'
 let frameId = 0
 
 export default Vue.extend({
-    props: ['src', 'sandbox'],
+    props: {
+        src: String,
+        sandbox: {
+            type: [Boolean, String],
+        },
+        type: {
+            type: String,
+            default: 'normal',
+        },
+    },
     data() {
         const id = ++frameId
 
@@ -25,9 +35,11 @@ export default Vue.extend({
             tabId: null,
             frameId: null,
             featurePolicy: [
-                'encrypted-media',
-                'picture-in-picture',
+                'midi',
                 'fullscreen',
+                'geolocation',
+                'picture-in-picture',
+                'encrypted-media',
                 'autoplay',
             ]
                 .map((feature) => `${feature} *`)
@@ -39,6 +51,7 @@ export default Vue.extend({
             const msg: {
                 action: string
                 type: string
+                frameId: number
                 data: {
                     tabId?: number
                     frameId?: number
@@ -51,13 +64,26 @@ export default Vue.extend({
                     case 'init':
                         this.tabId = msg.data.tabId
                         this.frameId = msg.data.frameId
-
+                        break
+                    case 'get-webview-info':
+                        this.$store.dispatch('sendToFrame', {
+                            event: {
+                                type: 'webview-info',
+                                targetFrameId: msg.frameId,
+                                data: {
+                                    type: this.type,
+                                },
+                            },
+                        })
                         break
                     case 'will-navigate':
                         this.currentURL = msg.data.url
                         break
                 }
             }
+        },
+        sendMessage(msg: unknown) {
+            this.$store.dispatch('sendWebviewEvent', { event: msg })
         },
         setURL(url: string) {
             this.src = url

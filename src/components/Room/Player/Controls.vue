@@ -6,7 +6,7 @@
                     <FontAwesomeIcon icon="step-backward" />
                 </button>
             </div> -->
-            <div class="item">
+            <div class="item" v-if="showControls">
                 <button @click="togglePlay">
                     <FontAwesomeIcon
                         :icon="player.playing ? 'pause' : 'play'"
@@ -19,12 +19,16 @@
                 </button>
             </div>
         </div>
-        <TimeIndicator />
+        <TimeIndicator v-visible="showControls" />
         <div class="right">
-            <div class="time">-{{ timeLeft }}</div>
+            <div class="time" v-visible="showControls">-{{ timeLeft }}</div>
             <div class="controls">
-                <VolumeControls />
-                <div class="item captions" v-if="player.captions.length > 0">
+                <VolumeControls v-visible="showControls" />
+                <div
+                    class="item captions"
+                    v-visible="showControls"
+                    v-if="player.captions.length > 0"
+                >
                     <div class="list">
                         <div
                             v-for="caption in player.captions"
@@ -73,6 +77,9 @@ export default Vue.extend({
         fullscreenIcon(): string {
             return this.fullscreen ? 'compress' : 'expand'
         },
+        showControls(): boolean {
+            return !this.player.isLivestream
+        },
         ...mapState(['player']),
     },
     methods: {
@@ -98,6 +105,12 @@ export default Vue.extend({
         },
         onKeyDown(e: KeyboardEvent) {
             const { currentTime, volume } = this.player
+            const target = e.target as HTMLElement
+            const inputTags = ['input', 'textarea']
+
+            if (target && inputTags.includes(target.tagName.toLowerCase())) {
+                return
+            }
 
             switch (e.key) {
                 case 'f':

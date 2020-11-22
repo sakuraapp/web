@@ -1,7 +1,12 @@
 <template>
     <div class="room">
         <Player v-if="player.url">
-            <Webview :src="player.url" v-show="showPlayer" />
+            <Webview
+                :src="player.url"
+                v-show="showPlayer"
+                type="player"
+                :sandbox="false"
+            />
         </Player>
         <div class="placeholderScreen" v-if="showPlaceholder">
             <Logo />

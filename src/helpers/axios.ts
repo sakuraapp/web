@@ -18,6 +18,7 @@ axios.interceptors.request.use((config) => {
 
     if (token) {
         config.headers.Authorization = `Bearer ${token}`
+        config.headers['X-Socket-Id'] = store.state.socketId
     }
 
     return config

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="ready">
         <InviteView
             :room="invitation.room"
             @close="hideInvite"
@@ -23,7 +23,7 @@ export default Vue.extend({
         Room,
         InviteView,
     },
-    computed: mapState(['room', 'user', 'invitation']),
+    computed: mapState(['ready', 'room', 'user', 'invitation']),
     methods: {
         hideInvite() {
             this.$store.commit('cancelRoomInvitation')
