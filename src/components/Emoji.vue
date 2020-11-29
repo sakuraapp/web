@@ -11,7 +11,7 @@ import { emojify } from '~/helpers/emoji'
 export default Vue.extend({
     props: ['content', 'size'],
     mounted() {
-        emojify(this.$refs.content)
+        emojify(this.$refs.content, null, this.$options._scopeId)
     },
 })
 </script>

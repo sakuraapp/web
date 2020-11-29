@@ -1,5 +1,6 @@
 <template>
     <div class="browser">
+        <LeaveRoomBtn v-if="!isPopup && !url" />
         <div class="content" ref="content" v-if="!url" @click="onClick">
             <slot />
             <div class="addressBar">
@@ -72,11 +73,13 @@
 <script lang="ts">
 import Vue from 'vue'
 import Webview from '../Webview.vue'
+import LeaveRoomBtn from '../Room/LeaveRoomBtn.vue'
 
 export default Vue.extend({
     props: ['isPopup'],
     components: {
         Webview,
+        LeaveRoomBtn,
     },
     methods: {
         navigate(url: string, appendForward = false, changeSrc = true) {
@@ -362,5 +365,9 @@ export default Vue.extend({
 .body .addressBar .btn svg:not(:last-child),
 .body .addressBar .btn .icon:not(:last-child) {
     margin-right: 0.4em;
+}
+
+.leaveRoomBtn {
+    font-size: 1.4em;
 }
 </style>

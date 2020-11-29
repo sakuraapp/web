@@ -7,9 +7,7 @@
                 @click="togglePlay"
                 @dblclick="toggleFullscreen"
             >
-                <button class="leaveRoomBtn" @click="leaveRoom">
-                    <FontAwesomeIcon icon="arrow-left" />
-                </button>
+                <LeaveRoomBtn />
                 <Controls ref="controls" />
             </div>
         </div>
@@ -20,10 +18,12 @@
 <script lang="ts">
 import Vue from 'vue'
 import Controls from './Controls.vue'
+import LeaveRoomBtn from '../LeaveRoomBtn.vue'
 
 export default Vue.extend({
     components: {
         Controls,
+        LeaveRoomBtn,
     },
     methods: {
         togglePlay(e: MouseEvent) {
@@ -33,9 +33,6 @@ export default Vue.extend({
         },
         toggleFullscreen() {
             this.$refs.controls.toggleFullscreen()
-        },
-        leaveRoom() {
-            this.$store.dispatch('leaveRoom')
         },
     },
 })
@@ -63,20 +60,5 @@ export default Vue.extend({
     height: 100%;
     position: relative;
     display: flex;
-}
-
-.leaveRoomBtn {
-    position: absolute;
-    top: 2.5%;
-    left: 2%;
-    background: transparent;
-    color: grey;
-    font-size: 2em;
-    border: 0;
-    cursor: pointer;
-    outline: none;
-}
-.leaveRoomBtn:hover {
-    color: lightgrey;
 }
 </style>

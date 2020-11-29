@@ -9,10 +9,10 @@ export interface User {
 }
 
 export default class AccountService {
-    static openLogin(): void {
-        const url = `${process.env.API_URL}/auth/login`
+    static loginUrl = `${process.env.API_URL}/auth/login`
 
-        window.location.href = url
+    static openLogin(): void {
+        window.location.href = this.loginUrl
     }
 
     static async verifyLogin(): Promise<boolean> {

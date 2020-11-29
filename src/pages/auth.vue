@@ -33,7 +33,7 @@ export default Vue.extend({
 
             const { nextUrl } = this.$route.params
 
-            this.$router.push(nextUrl || { name: 'main' })
+            this.$router.push(nextUrl || { name: 'app' })
         } catch (err) {
             console.error(err)
 

@@ -13,6 +13,10 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
     if (to.matched.some((record) => record.meta.requiresAuth)) {
+        if (store.state.ws) {
+            return next()
+        }
+
         AccountService.isLoggedIn().then((loggedIn) => {
             if (loggedIn) {
                 store.commit('setupWindow')

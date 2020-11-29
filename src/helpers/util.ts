@@ -45,3 +45,7 @@ export function getScopeId(el: HTMLElement): string {
 
     return Object.keys(dataset)[0]
 }
+
+export function getAbsoluteUrl(path: string): string {
+    return `${location.protocol}//${location.host}${path}`
+}

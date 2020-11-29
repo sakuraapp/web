@@ -1,5 +1,5 @@
 <template>
-    <div id="container">
+    <div id="container" v-if="!isRootView">
         <div id="header" v-if="!room">
             <Logo />
             <Profile v-if="user" :user="user" />
@@ -8,6 +8,7 @@
             <router-view id="view" />
         </div>
     </div>
+    <router-view v-else />
 </template>
 
 <script lang="ts">
@@ -15,13 +16,21 @@ import Vue from 'vue'
 import { mapState } from 'vuex'
 import Logo from './Logo.vue'
 import Profile from './Profile.vue'
+import { RouteRecord } from 'vue-router'
 
 export default Vue.extend({
     components: {
         Logo,
         Profile,
     },
-    computed: mapState(['room', 'user', 'invitation']),
+    computed: {
+        isRootView() {
+            return this.$route.matched.some(
+                (record: RouteRecord) => record.meta.isRootView
+            )
+        },
+        ...mapState(['room', 'user', 'invitation']),
+    },
 })
 </script>
 

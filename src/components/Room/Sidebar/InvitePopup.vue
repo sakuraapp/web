@@ -17,6 +17,7 @@
 import Vue from 'vue'
 import { mapState } from 'vuex'
 import Popup from '~/components/Popup.vue'
+import { getAbsoluteUrl } from '~/helpers/util'
 
 export default Vue.extend({
     components: {
@@ -25,7 +26,7 @@ export default Vue.extend({
     computed: {
         ...mapState(['room']),
         inviteUrl() {
-            return `${process.env.SITE_URL}/room/${this.room.id}`
+            return getAbsoluteUrl(`/room/${this.room.id}`)
         },
     },
     methods: {
