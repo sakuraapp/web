@@ -39,3 +39,9 @@ export function isMouseNear(
 
     return x > left && x < right && y > top && y < bottom
 }
+
+export function getScopeId(el: HTMLElement): string {
+    const dataset = el.dataset
+
+    return Object.keys(dataset)[0]
+}
