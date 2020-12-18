@@ -36,7 +36,16 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: ['vue-style-loader', 'css-loader'],
+                use: ['vue-style-loader', 
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            url: (url, resourcePath) => {
+                                return !url.startsWith('/'); // don't try to process absolute paths (e.g. nginx aliases, iis directories etc)
+                            },
+                        }
+                    }
+                ],
             },
             {
                 test: /\.(png|jpe?g|gif|svg)$/,
@@ -58,7 +67,6 @@ module.exports = {
             vue$: 'vue/dist/vue.esm.js',
             '~': basePath,
             '@': basePath,
-            '@common': path.join(rootPath, '..', 'common'),
         },
         plugins: [
             new TsconfigPathsPlugin({

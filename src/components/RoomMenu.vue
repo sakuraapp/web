@@ -55,7 +55,7 @@ export default Vue.extend({
             if (this.busy) return
 
             this.busy = true
-            this.$store.dispatch('createRoom')
+            this.$store.dispatch('createRoom', 2)
         },
     },
     mounted() {

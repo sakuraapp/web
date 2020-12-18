@@ -1,5 +1,5 @@
 import store from '~/store'
-import Permissions from '@common/permissions.json'
+import { Permissions } from '@sakuraapp/common'
 
 export function getPermission(name: string): number {
     const keys = Object.keys(Permissions)

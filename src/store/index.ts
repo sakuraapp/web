@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex, { GetterTree, MutationTree, ActionTree } from 'vuex'
 import cookies from 'browser-cookies'
 import AccountService, { User } from 'account/account'
-import Opcodes from '@common/opcodes.json'
+import { Opcodes } from '@sakuraapp/common'
 import axios from 'helpers/axios'
 
 Vue.use(Vuex)
@@ -35,8 +35,11 @@ interface QueueItem {
     author: string
 }
 
+type RoomType = 1 | 2
+
 interface Room {
     id: string
+    type: RoomType
     owner: string
     users: Array<string>
     messages: Array<MessageGroup>
@@ -61,6 +64,15 @@ interface WebviewEvent {
     targetFrameId?: number
     data: unknown
     t?: number
+}
+
+export interface ControlEvent {
+    type: string
+    data: {
+        x?: number
+        y?: number
+        key?: string
+    }
 }
 
 interface CaptionTrack {
@@ -187,6 +199,7 @@ export const mutations: MutationTree<State> = {
         state,
         data?: {
             id: string
+            type: RoomType
             owner: string
             users: Array<User>
             queue: Array<QueueItem>
@@ -527,8 +540,8 @@ export const actions: ActionTree<State, null> = {
         store.dispatch('sendWebSocket', { op: Opcodes.LEAVE_ROOM })
     },
 
-    createRoom(store): void {
-        store.dispatch('sendWebSocket', { op: Opcodes.CREATE_ROOM })
+    createRoom(store, type: RoomType): void {
+        store.dispatch('sendWebSocket', { op: Opcodes.CREATE_ROOM, d: type })
     },
 
     handleJoinRoomRequest(store, data: { id: string }) {
@@ -686,6 +699,13 @@ export const actions: ActionTree<State, null> = {
 
     handleSeek(store, { time, latency }: { time: number; latency: number }) {
         store.commit('handleSetCurrentTime', time + latency / 1000)
+    },
+
+    dispatchControl(store, data: ControlEvent) {
+        store.dispatch('sendWebSocket', {
+            op: Opcodes.DISPATCH_CONTROL,
+            d: data,
+        })
     },
 }
 

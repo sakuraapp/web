@@ -15,6 +15,6 @@ module.exports = merge.smart(baseConfig, {
         writeToDisk: true,
         disableHostCheck: true,
         historyApiFallback: true,
-        port: 8081
+        port: process.env.PORT,
     }
 })

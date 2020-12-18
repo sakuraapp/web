@@ -1,22 +1,31 @@
 <template>
     <div class="room">
-        <Player v-if="player.url">
-            <Webview
-                :src="player.url"
-                v-show="showPlayer"
-                type="player"
-                :sandbox="false"
+        <template v-if="room.type === 1">
+            <Player v-if="player.url">
+                <Webview
+                    :src="player.url"
+                    v-show="showPlayer"
+                    type="player"
+                    :sandbox="false"
+                />
+            </Player>
+            <div class="placeholderScreen" v-if="showPlaceholder">
+                <Logo />
+                Waiting for something to play...
+            </div>
+            <Browser
+                @close="handleCloseBrowser"
+                v-if="showBrowser"
+                :asPopup="browserPopup"
             />
-        </Player>
-        <div class="placeholderScreen" v-if="showPlaceholder">
-            <Logo />
-            Waiting for something to play...
-        </div>
-        <Browser
-            @close="handleCloseBrowser"
-            v-if="showBrowser"
-            :asPopup="browserPopup"
-        />
+        </template>
+        <template v-else-if="room.type === 2">
+            <div class="placeholderScreen" v-if="!player.url">
+                <Logo />
+                Waiting for a room to become available...
+            </div>
+            <StreamPlayer v-else />
+        </template>
         <Sidebar @queueAddClick="handleShowBrowser" />
     </div>
 </template>
@@ -31,6 +40,7 @@ import Sidebar from './Sidebar/index.vue'
 import Player from './Player/index.vue'
 import Webview from '../Webview.vue'
 import Browser from '../Browser/index.vue'
+import StreamPlayer from './StreamPlayer.vue'
 
 export default Vue.extend({
     components: {
@@ -39,6 +49,7 @@ export default Vue.extend({
         Player,
         Webview,
         Browser,
+        StreamPlayer,
     },
     data() {
         return { browserPopup: false }

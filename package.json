@@ -47,6 +47,8 @@
     "@fortawesome/free-regular-svg-icons": "^5.13.1",
     "@fortawesome/free-solid-svg-icons": "^5.13.1",
     "@fortawesome/vue-fontawesome": "^0.1.10",
+    "@sakuraapp/chakra-client": "^1.0.0",
+    "@sakuraapp/common": "^1.0.8",
     "axios": "^0.19.2",
     "axios-extensions": "^3.1.3",
     "events": "^3.1.0",

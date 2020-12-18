@@ -105,7 +105,7 @@ export default Vue.extend({
 }
 
 .container .side {
-    background-image: url('~/assets/sakura.jpg');
+    background-image: url('~assets/sakura.jpg');
     background-size: cover;
     background-position: center;
     filter: grayscale(40%);

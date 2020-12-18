@@ -14,11 +14,11 @@ html, body {
 
 body {
     background-color: #1d1d1d;
-    background-image: url('~/assets/background.png');
+    background-image: url('~assets/background.png');
     background-size: cover;
     background-position: center;
     background-color: #000;
-    /* background-image: url('~/assets/gaming-pattern-darker.png'); */
+    /* background-image: url('~assets/gaming-pattern-darker.png'); */
     color: #fff;
     margin: 0;
     padding: 0;
