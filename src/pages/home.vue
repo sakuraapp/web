@@ -25,7 +25,15 @@
                 </div>
                 <button class="btn open" @click="openApp" v-else>Open</button>
             </div>
-            <div class="bottom"></div>
+            <div class="bottom footer">
+                Icon was made by
+                <a
+                    href="https://www.flaticon.com/authors/freepik"
+                    title="Freepik"
+                    target="_blank"
+                    >Freepik</a
+                >
+            </div>
         </div>
         <div class="side"></div>
     </div>
@@ -145,5 +153,13 @@ export default Vue.extend({
 
 .sakuraLogo {
     justify-content: flex-start;
+}
+.footer {
+    text-align: left;
+    font-size: 0.8em;
+    color: rgb(90, 90, 90);
+}
+.footer a {
+    color: rgb(130, 130, 130);
 }
 </style>
