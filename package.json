@@ -1,5 +1,5 @@
 {
-  "name": "@sakura/app",
+  "name": "@sakuraapp/web",
   "version": "1.0.0",
   "description": "Sakura web app",
   "private": true,
@@ -9,8 +9,20 @@
     "dev": "webpack-dev-server --config config/webpack.config.dev.js",
     "build": "webpack --config config/webpack.config.prod.js"
   },
-  "author": "jackie",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sakuraapp/web.git"
+  },
+  "author": {
+    "name": "Ahmed El-Marakby",
+    "email": "ahmedelmarakby@hotmail.com",
+    "url": "https://pyrodash.github.io"
+  },
+  "bugs": {
+    "url": "https://github.com/sakuraapp/web/issues"
+  },
+  "homepage": "https://github.com/sakuraapp/web#readme",
+  "license": "AGPL-3.0-only",
   "devDependencies": {
     "@types/twemoji": "^12.1.1",
     "@types/webpack-env": "^1.15.2",
