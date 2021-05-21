@@ -71,11 +71,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 import Webview from '../Webview.vue'
 import LeaveRoomBtn from '../Room/LeaveRoomBtn.vue'
 
-export default Vue.extend({
+export default defineComponent({
     props: ['isPopup'],
     components: {
         Webview,
@@ -160,7 +160,7 @@ export default Vue.extend({
             }
         )
     },
-    beforeDestroy() {
+    beforeUnmount() {
         this.unwatch()
     },
     computed: {

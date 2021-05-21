@@ -34,13 +34,13 @@ video {
 </style>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 import { mapState } from 'vuex'
 import { ControlEvent } from '~/store'
 import { hasPermission } from '~/helpers/permission'
 import { mountChakra } from '~/helpers/chakra'
 
-export default Vue.extend({
+export default defineComponent({
     data() {
         return {
             flvPlayer: null,
@@ -157,7 +157,7 @@ export default Vue.extend({
             this.$refs.video
         )
     },
-    beforeDestroy() {
+    beforeUnmount() {
         window.removeEventListener('resize', this.handleResize)
     },
 })

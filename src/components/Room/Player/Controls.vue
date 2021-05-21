@@ -54,13 +54,13 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 import { mapState } from 'vuex'
 import { formatSeconds } from 'helpers/util'
 import TimeIndicator from './TimeIndicator.vue'
 import VolumeControls from './VolumeControls.vue'
 
-export default Vue.extend({
+export default defineComponent({
     components: {
         TimeIndicator,
         VolumeControls,
@@ -140,7 +140,7 @@ export default Vue.extend({
         document.addEventListener('keydown', this.onKeyDown)
         document.addEventListener('fullscreenchange', this.onFullscreenChange)
     },
-    beforeDestroy() {
+    beforeUnmount() {
         document.removeEventListener('keydown', this.onKeyDown)
         document.removeEventListener(
             'fullscreenchange',

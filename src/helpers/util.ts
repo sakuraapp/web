@@ -1,7 +1,9 @@
 export function isDevelopment(): boolean {
-    const env = process.env.NODE_ENV || 'development'
+    return import.meta.env.DEV
+}
 
-    return env === 'development'
+export function getEnv(key: string): string {
+    return import.meta.env[`VITE_${key}`]?.toString()
 }
 
 export function pad(d: number): string {

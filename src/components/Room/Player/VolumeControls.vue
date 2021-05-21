@@ -16,12 +16,12 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 import { mapState } from 'vuex'
 import { isMouseNear } from 'helpers/util'
 import VolumeIndicator from './VolumeIndicator.vue'
 
-export default Vue.extend({
+export default defineComponent({
     components: {
         VolumeIndicator,
     },
@@ -76,7 +76,7 @@ export default Vue.extend({
             window.removeEventListener('mousemove', this.onMouseMove)
         },
     },
-    beforeDestroy() {
+    beforeUnmount() {
         this.onHideIndicator()
     },
 })

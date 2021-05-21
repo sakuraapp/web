@@ -14,12 +14,12 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 import { mapState } from 'vuex'
 import Popup from '~/components/Popup.vue'
 import { getAbsoluteUrl } from '~/helpers/util'
 
-export default Vue.extend({
+export default defineComponent({
     components: {
         Popup,
     },

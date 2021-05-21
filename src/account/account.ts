@@ -1,4 +1,5 @@
 import axios from 'helpers/axios'
+import { getEnv } from '~/helpers/util'
 import store from '~/store'
 
 export interface User {
@@ -9,18 +10,10 @@ export interface User {
 }
 
 export default class AccountService {
-    static loginUrl = `${process.env.API_URL}/auth/login`
+    static loginUrl = `${getEnv('API_URL')}/oauth2/discord/login`
 
     static openLogin(): void {
         window.location.href = this.loginUrl
-    }
-
-    static async verifyLogin(): Promise<boolean> {
-        const res = await axios.get('/auth/verify')
-
-        console.log(res)
-
-        return false
     }
 
     static async isLoggedIn(): Promise<boolean> {
@@ -48,8 +41,8 @@ export default class AccountService {
     }
 
     static async fetchUserData(): Promise<User> {
-        const res = await axios.get('/users/me')
-        const user: User = res.data
+        const res = await axios.get('/users/@me')
+        const user: User = res.data.user
 
         store.commit('handleMyUser', user)
 

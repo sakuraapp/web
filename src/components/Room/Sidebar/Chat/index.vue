@@ -1,17 +1,20 @@
 <template>
     <div class="messages" ref="messages">
-        <template v-for="(group, index) in messages">
-            <Message :group="group" :key="`message-group-${index}`" />
+        <template
+            v-for="(group, index) in messages"
+            :key="`message-group-${index}`"
+        >
+            <Message :group="group" />
         </template>
     </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 import { mapGetters } from 'vuex'
 import Message from './Message.vue'
 
-export default Vue.extend({
+export default defineComponent({
     components: {
         Message,
     },
@@ -47,7 +50,7 @@ export default Vue.extend({
             }
         )
     },
-    beforeDestroy() {
+    beforeUnmount() {
         this.unsubscribe()
     },
 })

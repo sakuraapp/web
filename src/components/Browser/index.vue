@@ -4,11 +4,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 import Browser from './Browser.vue'
 import Popup from '../Popup.vue'
 
-export default Vue.extend({
+export default defineComponent({
     props: ['asPopup'],
     components: {
         Browser,

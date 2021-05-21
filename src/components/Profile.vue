@@ -1,6 +1,9 @@
 <template>
     <div id="profile" :class="{ userProfile: true, right: alignRight }">
-        <div class="avatar" :style="`backgroundImage: url('${avatar}')`"></div>
+        <div
+            class="avatar"
+            :style="{ backgroundImage: `url('${avatar}')` }"
+        ></div>
         <div class="info">
             <div class="username">{{ username }}</div>
             <div class="discriminator">#{{ discriminator }}</div>
@@ -9,9 +12,9 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 
-export default Vue.extend({
+export default defineComponent({
     props: ['user', 'alignRight'],
     data() {
         return this.user

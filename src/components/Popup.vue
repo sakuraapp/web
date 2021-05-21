@@ -22,13 +22,13 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 
 function isPropTrue(val?: unknown): boolean {
     return val !== undefined && val !== false
 }
 
-export default Vue.extend({
+export default defineComponent({
     props: ['component', 'flexbox', 'center'],
     computed: {
         classAttr() {

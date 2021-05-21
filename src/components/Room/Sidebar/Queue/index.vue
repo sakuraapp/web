@@ -9,23 +9,24 @@
             </div>
         </div>
         <div class="items">
-            <template v-for="(item, index) in queue">
-                <QueueItem :item="item" :position="index + 1" :key="item.id" />
+            <template v-for="(item, index) in queue" :key="item.id">
+                <QueueItem :item="item" :position="index + 1" />
             </template>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 import { mapGetters } from 'vuex'
 import { hasPermission } from 'helpers/permission'
 import QueueItem from './Item.vue'
 
-export default Vue.extend({
+export default defineComponent({
     components: {
         QueueItem,
     },
+    emits: ['queue-add-click'],
     computed: {
         hasPermission() {
             return hasPermission('QUEUE_ADD')
@@ -34,7 +35,7 @@ export default Vue.extend({
     },
     methods: {
         addToQueue() {
-            this.$emit('queueAddClick')
+            this.$emit('queue-add-click')
         },
     },
 })

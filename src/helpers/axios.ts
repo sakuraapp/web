@@ -2,13 +2,14 @@ import Axios from 'axios'
 import { cacheAdapterEnhancer } from 'axios-extensions'
 import AccountService from 'account/account'
 import store from '../store'
+import { getEnv, isDevelopment } from './util'
 
-const adapter =
-    process.env.NODE_ENV !== 'development'
-        ? cacheAdapterEnhancer(Axios.defaults.adapter)
-        : null
+const adapter = !isDevelopment()
+    ? cacheAdapterEnhancer(Axios.defaults.adapter)
+    : null
+
 const axios = Axios.create({
-    baseURL: process.env.API_URL,
+    baseURL: getEnv('API_URL'),
     headers: { 'Cache-Control': 'no-cache' },
     adapter,
 })

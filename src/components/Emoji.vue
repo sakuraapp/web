@@ -5,10 +5,10 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 import { emojify } from '~/helpers/emoji'
 
-export default Vue.extend({
+export default defineComponent({
     props: ['content', 'size'],
     mounted() {
         emojify(this.$refs.content, null, this.$options._scopeId)

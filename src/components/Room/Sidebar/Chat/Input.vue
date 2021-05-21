@@ -21,12 +21,13 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 import emoji from '~/helpers/emoji'
-import Emoji from '~/components/Emoji'
+import Emoji from '~/components/Emoji.vue'
 
-export default Vue.extend({
+export default defineComponent({
     components: {
+        // eslint-disable-next-line vue/no-unused-components
         Emoji,
     },
     data() {

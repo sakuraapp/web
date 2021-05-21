@@ -19,13 +19,13 @@
         </div>
         <InvitePopup @close="invitePopup = false" v-if="invitePopup" />
         <Chat v-if="tab === 'chat'" />
-        <Queue @queueAddClick="addToQueue" v-else-if="tab === 'queue'" />
+        <Queue @queue-add-click="addToQueue" v-else-if="tab === 'queue'" />
         <ChatInput v-if="tab === 'chat'" />
     </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 import { mapState } from 'vuex'
 import Profile from '../../Profile.vue'
 import InvitePopup from './InvitePopup.vue'
@@ -33,7 +33,7 @@ import Chat from './Chat/index.vue'
 import ChatInput from './Chat/Input.vue'
 import Queue from './Queue/index.vue'
 
-export default Vue.extend({
+export default defineComponent({
     components: {
         Profile,
         InvitePopup,
@@ -41,6 +41,7 @@ export default Vue.extend({
         Queue,
         ChatInput,
     },
+    emits: ['queue-add-click'],
     data() {
         return {
             tab: 'chat',
@@ -53,7 +54,7 @@ export default Vue.extend({
             this.tab = name
         },
         addToQueue() {
-            this.$emit('queueAddClick')
+            this.$emit('queue-add-click')
         },
     },
 })

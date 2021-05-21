@@ -5,21 +5,22 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 
-export default Vue.extend({
+export default defineComponent({
     data() {
         return {
             message: 'Authenticating...',
         }
     },
     async mounted() {
+        const { providerId } = this.$route.params
         const { code } = this.$route.query
 
         if (!code) return
 
         try {
-            const res = await this.$axios.get('/auth/login', {
+            const res = await this.$axios.get(`/oauth2/${providerId}/login`, {
                 params: { code },
             })
 

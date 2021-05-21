@@ -1,4 +1,5 @@
-import Vue, { VNode } from 'vue'
+import { createApp } from 'vue'
+import VueAxios from 'vue-axios'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
@@ -14,15 +15,12 @@ import './index.css'
 
 library.add(fas)
 
-Vue.component('FontAwesomeIcon', FontAwesomeIcon)
-Vue.directive('visible', (el, binding) => {
-    el.style.visibility = binding.value ? 'visible' : 'hidden'
-})
-Vue.prototype.$axios = axios
-
-new Vue({
-    store,
-    router,
-    el: '#app-container',
-    render: (h): VNode => h(App),
-})
+createApp(App)
+    .use(VueAxios, axios)
+    .use(store)
+    .use(router)
+    .component('FontAwesomeIcon', FontAwesomeIcon)
+    .directive('visible', (el, binding) => {
+        el.style.visibility = binding.value ? 'visible' : 'hidden'
+    })
+    .mount('#app')

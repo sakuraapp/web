@@ -40,11 +40,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 import AccountService from '~/account/account'
 import Logo from '~/components/Logo.vue'
 
-export default Vue.extend({
+export default defineComponent({
     components: {
         Logo,
     },
@@ -113,7 +113,7 @@ export default Vue.extend({
 }
 
 .container .side {
-    background-image: url('~assets/sakura.jpg');
+    background-image: url('~/assets/sakura.jpg');
     background-size: cover;
     background-position: center;
     filter: grayscale(40%);

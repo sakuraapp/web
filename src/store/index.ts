@@ -1,14 +1,12 @@
-import Vue from 'vue'
-import Vuex, { GetterTree, MutationTree, ActionTree } from 'vuex'
+import { createStore, GetterTree, MutationTree, ActionTree } from 'vuex'
 import cookies from 'browser-cookies'
 import AccountService, { User } from 'account/account'
 import { Opcodes } from '@sakuraapp/common'
 import axios from 'helpers/axios'
-
-Vue.use(Vuex)
+import { getEnv } from '~/helpers/util'
 
 const RECONNECT_INTERVAL = 15 * 1000 // 15s
-const env = process.env.NODE_ENV || 'development'
+const env = import.meta.env.MODE
 
 interface Packet {
     op: number
@@ -161,6 +159,10 @@ export const mutations: MutationTree<State> = {
         state.ready = ready
     },
 
+    handleConnected(state, value) {
+        state.connected = value
+    },
+
     handleToken(
         state,
         {
@@ -176,7 +178,7 @@ export const mutations: MutationTree<State> = {
                 cookies.set('token', token, {
                     expires: 365,
                     secure: env !== 'development',
-                    domain: process.env.COOKIE_DOMAIN,
+                    domain: getEnv('COOKIE_DOMAIN'),
                 })
             } else {
                 cookies.erase('token')
@@ -383,7 +385,7 @@ export const mutations: MutationTree<State> = {
     },
 
     setupWebSocket(state) {
-        const ws = new WebSocket(process.env.WEBSOCKET_SERVER_ADDRESS)
+        const ws = new WebSocket(getEnv('WEBSOCKET_SERVER_ADDRESS'))
 
         ws.onopen = () => {
             this.commit('invalidateReconnect')
@@ -407,7 +409,7 @@ export const mutations: MutationTree<State> = {
                     } else {
                         const info = packet.d as { socketId: string }
 
-                        state.connected = true
+                        this.commit('handleConnected', true)
                         state.socketId = info.socketId
                     }
                     break
@@ -709,7 +711,7 @@ export const actions: ActionTree<State, null> = {
     },
 }
 
-export default new Vuex.Store({
+export default createStore({
     state: initialState(),
     getters,
     mutations,

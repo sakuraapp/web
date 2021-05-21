@@ -10,11 +10,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 
 let frameId = 0
 
-export default Vue.extend({
+export default defineComponent({
     props: {
         src: String,
         sandbox: {
@@ -86,7 +86,7 @@ export default Vue.extend({
             this.$store.dispatch('sendWebviewEvent', { event: msg })
         },
         setURL(url: string) {
-            this.src = url
+            this.$emit('set-url', url)
         },
     },
     watch: {
@@ -99,7 +99,7 @@ export default Vue.extend({
 
         this.url = this.src
     },
-    beforeDestroy() {
+    beforeUnmount() {
         window.removeEventListener('message', this.handleMessage)
     },
 })

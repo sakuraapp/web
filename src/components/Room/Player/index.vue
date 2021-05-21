@@ -16,11 +16,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 import Controls from './Controls.vue'
 import LeaveRoomBtn from '../LeaveRoomBtn.vue'
 
-export default Vue.extend({
+export default defineComponent({
     components: {
         Controls,
         LeaveRoomBtn,

@@ -1,13 +1,10 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import routes from './routes'
 import AccountService from '~/account/account'
 import store from '~/store'
 
-Vue.use(VueRouter)
-
-const router = new VueRouter({
-    mode: 'history',
+const router = createRouter({
+    history: createWebHistory(),
     routes,
 })
 

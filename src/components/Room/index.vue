@@ -26,12 +26,12 @@
             </div>
             <StreamPlayer v-else />
         </template>
-        <Sidebar @queueAddClick="handleShowBrowser" />
+        <Sidebar @queue-add-click="handleShowBrowser" />
     </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 import { mapState } from 'vuex'
 import { hasPermission } from 'helpers/permission'
 import { isDevelopment } from 'helpers/util'
@@ -42,7 +42,7 @@ import Webview from '../Webview.vue'
 import Browser from '../Browser/index.vue'
 import StreamPlayer from './StreamPlayer.vue'
 
-export default Vue.extend({
+export default defineComponent({
     components: {
         Logo,
         Sidebar,

@@ -12,13 +12,13 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from 'vue'
 import { mapState } from 'vuex'
 import Logo from './Logo.vue'
 import Profile from './Profile.vue'
 import { RouteRecord } from 'vue-router'
 
-export default Vue.extend({
+export default defineComponent({
     components: {
         Logo,
         Profile,
