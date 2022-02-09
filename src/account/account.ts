@@ -1,50 +1,51 @@
-import axios from 'helpers/axios'
+import cookies from 'browser-cookies'
+import axios from '~/helpers/axios'
 import { getEnv } from '~/helpers/util'
-import store from '~/store'
+import router from '~/router'
+import { User } from '~/types'
 
-export interface User {
-    id: string
-    username: string
-    discriminator: string
-    avatar?: string
-}
+const env = import.meta.env.MODE
 
-export default class AccountService {
-    static loginUrl = `${getEnv('API_URL')}/oauth2/discord/login`
-
-    static openLogin(): void {
-        window.location.href = this.loginUrl
+export class AccountService {
+    static isLoggedIn(): boolean {
+        return Boolean(this.getToken())
     }
 
-    static async isLoggedIn(): Promise<boolean> {
-        const token = await this.fetchToken()
+    static getLoginUrl(provider: string): string {
+        return `${getEnv('API_URL')}/auth/${provider}`
+    }
 
+    static getToken(): string {
+        return cookies.get('token') || ''
+    }
+
+    static setToken(token?: string): void {
         if (token) {
-            if (!store.state.user) await this.fetchUserData()
-
-            return true
+            cookies.set('token', token, {
+                expires: 365,
+                secure: env !== 'development',
+                domain: getEnv('COOKIE_DOMAIN'),
+            })
         } else {
-            return false
+            cookies.erase('token')
+        }
+    }
+
+    static openLogin(provider?: string): void {
+        if (provider) {
+            window.location.href = this.getLoginUrl(provider)
+        } else {
+            router.push({ name: 'login' })
         }
     }
 
     static logout(): void {
-        return store.commit('handleToken', { token: null, save: true })
-    }
-
-    static async fetchToken(): Promise<string> {
-        const token: string = await store.dispatch('getToken')
-
-        store.commit('handleToken', { token })
-
-        return token
+        this.setToken()
     }
 
     static async fetchUserData(): Promise<User> {
         const res = await axios.get('/users/@me')
         const user: User = res.data.user
-
-        store.commit('handleMyUser', user)
 
         return user
     }

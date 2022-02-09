@@ -7,10 +7,7 @@ const root = join(__dirname, 'src')
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    plugins: [
-        vue(),
-        tsconfigPaths({ root: __dirname }),
-    ],
+    plugins: [vue(), tsconfigPaths({ root: __dirname })],
     root,
     resolve: {
         alias: {
@@ -19,6 +16,6 @@ export default defineConfig({
         },
     },
     optimizeDeps: {
-        exclude: ['simple-peer', 'buffer'],
-    }
+        exclude: ['simple-peer'],
+    },
 })

@@ -38,18 +38,18 @@ export default defineComponent({
         }
     },
     computed: {
-        percentage() {
+        percentage(): string {
             return this.progress * 100 + '%'
         },
-        isVertical() {
+        isVertical(): boolean {
             return this.vertical !== false && this.vertical !== undefined
         },
-        barStyle() {
+        barStyle(): Record<string, string> {
             return !this.isVertical
                 ? { width: this.percentage }
                 : { height: this.percentage }
         },
-        indicatorStyle() {
+        indicatorStyle(): Record<string, string> {
             return !this.isVertical
                 ? { left: this.percentage }
                 : { top: (1 - this.progress) * 100 + '%' }
@@ -67,8 +67,39 @@ export default defineComponent({
         setHoverText(text: string) {
             this.hoverText = text
         },
+        renderHoverText(): void {
+            const hoverText = <HTMLElement>this.$refs.hoverText
+
+            const elRect = this.$el.getBoundingClientRect()
+            const hoverTextRect = hoverText.getBoundingClientRect()
+
+            const textPercentage = this.isVertical
+                ? hoverTextRect.height / elRect.height
+                : hoverTextRect.width / elRect.width
+
+            const offset = '-25px'
+            let progress: number
+
+            if (this.isVertical) {
+                progress = 1 - this.hoverProgress - textPercentage / 2
+            } else {
+                progress = this.hoverProgress - textPercentage / 2
+            }
+
+            const percentage = progress * 100 + '%'
+
+            this.hoverTextStyle = this.isVertical
+                ? {
+                      top: percentage,
+                      left: offset,
+                  }
+                : {
+                      top: offset,
+                      left: percentage,
+                  }
+        },
         onMouseMove(e: MouseEvent) {
-            const bounds = this.$refs.el.getBoundingClientRect()
+            const bounds = this.$el.getBoundingClientRect()
             const x = e.clientX - bounds.left
             const y = e.clientY - bounds.top
 
@@ -90,6 +121,10 @@ export default defineComponent({
             if (this.mouseDown) {
                 this.onChange()
             }
+
+            this.$nextTick(() => {
+                this.renderHoverText()
+            })
         },
         onHoverEnd() {
             this.hovering = false
@@ -111,33 +146,7 @@ export default defineComponent({
         hoverText() {
             this.$nextTick(() => {
                 if (this.hoverText) {
-                    const elRect = this.$refs.el.getBoundingClientRect()
-                    const hoverTextRect = this.$refs.hoverText.getBoundingClientRect()
-
-                    const textPercentage = this.isVertical
-                        ? hoverTextRect.height / elRect.height
-                        : hoverTextRect.width / elRect.width
-
-                    const offset = '-25px'
-                    let progress: number
-
-                    if (this.isVertical) {
-                        progress = 1 - this.hoverProgress - textPercentage / 2
-                    } else {
-                        progress = this.hoverProgress - textPercentage / 2
-                    }
-
-                    const percentage = progress * 100 + '%'
-
-                    this.hoverTextStyle = this.isVertical
-                        ? {
-                              top: percentage,
-                              left: offset,
-                          }
-                        : {
-                              top: offset,
-                              left: percentage,
-                          }
+                    this.renderHoverText()
                 }
             })
         },

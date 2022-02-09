@@ -1,6 +1,6 @@
 import Axios from 'axios'
 import { cacheAdapterEnhancer } from 'axios-extensions'
-import AccountService from 'account/account'
+import { AccountService } from '~/account/account'
 import store from '../store'
 import { getEnv, isDevelopment } from './util'
 
@@ -15,11 +15,11 @@ const axios = Axios.create({
 })
 
 axios.interceptors.request.use((config) => {
-    const token = store.state.token
+    const token = store.state.session.token
 
     if (token) {
         config.headers.Authorization = `Bearer ${token}`
-        config.headers['X-Socket-Id'] = store.state.socketId
+        config.headers['X-Session-Id'] = store.state.session.id
     }
 
     return config
@@ -33,7 +33,7 @@ axios.interceptors.response.use(
         if (res && res.status === 401) {
             // Automatically log user out if a request returns unauthorized
 
-            AccountService.logout()
+            AccountService.setToken()
             AccountService.openLogin()
         }
 

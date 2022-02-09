@@ -17,6 +17,8 @@
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "allowJs": true,
+        "strict": true,
+        "strictNullChecks": false,
         "lib": ["esnext", "dom"],
         "types": ["vite/client"]
     },

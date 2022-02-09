@@ -3,37 +3,35 @@
         :src="url"
         ref="iframe"
         :allow="featurePolicy"
-        :sandbox="sandbox"
-        :name="name"
         referrerpolicy="origin"
     />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { MessageEvent, SourceInfo } from '@sakuraapp/ext-message-broker'
+import { Bridge } from '~/bridge/bridge'
 
-let frameId = 0
+let webviewId = 0
 
 export default defineComponent({
     props: {
         src: String,
-        sandbox: {
-            type: [Boolean, String],
-        },
         type: {
             type: String,
             default: 'normal',
         },
     },
+    emits: ['navigate'],
     data() {
-        const id = ++frameId
+        const id = ++webviewId
 
         return {
             url: `about:blank?sakura-webview=${id}`,
-            name: `frame-${id}`,
             currentURL: this.src,
-            tabId: null,
-            frameId: null,
+            tabId: 0,
+            frameId: 0,
+            webviewId: id,
             featurePolicy: [
                 'midi',
                 'fullscreen',
@@ -44,63 +42,56 @@ export default defineComponent({
             ]
                 .map((feature) => `${feature} *`)
                 .join('; '),
+            sandboxPolicy: [
+                'forms',
+                'popups',
+                'presentation',
+                'same-origin',
+                'scripts',
+            ]
+                .filter(Boolean)
+                .map((feature) => `allow-${feature}`)
+                .join(' '),
         }
     },
+    computed: {
+        bridge(): Bridge {
+            return this.$store.state.session.bridge
+        },
+    },
     methods: {
-        handleMessage(e: MessageEvent) {
-            const msg: {
-                action: string
-                type: string
-                frameId: number
-                data: {
-                    tabId?: number
-                    frameId?: number
-                    url?: string
-                }
-            } = e.data
-
-            if (msg.action === 'sakura-webview-event') {
-                switch (msg.type) {
-                    case 'init':
-                        this.tabId = msg.data.tabId
-                        this.frameId = msg.data.frameId
-                        break
-                    case 'get-webview-info':
-                        this.$store.dispatch('sendToFrame', {
-                            event: {
-                                type: 'webview-info',
-                                targetFrameId: msg.frameId,
-                                data: {
-                                    type: this.type,
-                                },
-                            },
-                        })
-                        break
-                    case 'will-navigate':
-                        this.currentURL = msg.data.url
-                        break
-                }
+        onWebviewInit(e: MessageEvent<SourceInfo>) {
+            this.tabId = e.data.tabId
+            this.frameId = e.data.frameId || 0
+        },
+        getWebviewInfo(e: MessageEvent) {
+            if (e.source.webviewId === this.webviewId) {
+                e.reply('webview-info', { type: this.type })
             }
         },
-        sendMessage(msg: unknown) {
-            this.$store.dispatch('sendWebviewEvent', { event: msg })
-        },
-        setURL(url: string) {
-            this.$emit('set-url', url)
+        onWillNavigate(e: MessageEvent<string>) {
+            this.currentURL = e.data
         },
     },
     watch: {
         src(val: string) {
             this.url = val
         },
+        currentURL(val: string) {
+            this.$emit('navigate', val)
+        },
     },
     mounted() {
-        window.addEventListener('message', this.handleMessage)
+        this.bridge.on('webview-init', this.onWebviewInit)
+        this.bridge.on('get-webview-info', this.getWebviewInfo)
+        this.bridge.on('will-navigate', this.onWillNavigate)
 
-        this.url = this.src
+        this.url = this.src || ''
     },
-    beforeUnmount() {
-        window.removeEventListener('message', this.handleMessage)
+    unmounted() {
+        this.bridge.off('webview-init', this.onWebviewInit)
+        this.bridge.off('get-webview-info', this.getWebviewInfo)
+        this.bridge.off('will-navigate', this.onWillNavigate)
     },
 })
 </script>
@@ -108,7 +99,7 @@ export default defineComponent({
 <style scoped>
 iframe {
     flex-grow: 1;
-    /* width: 100%; */
+    width: 100%;
     height: 100%;
 }
 </style>

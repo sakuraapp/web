@@ -1,165 +1,120 @@
 <template>
-    <div class="container">
-        <div class="content">
-            <Logo />
-            <div class="middle">
+    <HomeLayout>
+        <template v-slot:nav>
+            <router-link class="item" to="/">
+                Home
+            </router-link>
+            <router-link class="item loginBtn" :to="loginRoute">
+                {{ loginLabel }}
+            </router-link>
+        </template>
+        <template v-slot:content>
+            <div class="left">
                 <div class="slogan">
-                    Watch stuff with your friends.
+                    Enjoy your favorite things with your favorite people.
                 </div>
-                <div class="btns" v-if="!isLoggedIn">
-                    <a
-                        v-for="provider in providers"
-                        :key="provider.name"
-                        :href="provider.url"
-                    >
-                        <button
-                            :class="{
-                                btn: true,
-                                [provider.name.toLowerCase()]: true,
-                            }"
-                        >
-                            <img :src="provider.icon" />
-                            Login with {{ provider.name }}
-                        </button>
-                    </a>
-                </div>
-                <button class="btn open" @click="openApp" v-else>Open</button>
+                <router-link class="signInBtn" :to="loginRoute">
+                    Start Watching
+                </router-link>
             </div>
-            <div class="bottom footer">
-                Icon was made by
-                <a
-                    href="https://www.flaticon.com/authors/freepik"
-                    title="Freepik"
-                    target="_blank"
-                    >Freepik</a
-                >
+            <div class="right">
+                test
             </div>
-        </div>
-        <div class="side"></div>
-    </div>
+        </template>
+    </HomeLayout>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import AccountService from '~/account/account'
-import Logo from '~/components/Logo.vue'
+import { AccountService } from 'account/account'
+import HomeLayout from '~/layouts/HomeLayout.vue'
 
 export default defineComponent({
     components: {
-        Logo,
+        HomeLayout,
     },
-    data() {
-        return {
-            isLoggedIn: false,
-            providers: [
-                {
-                    name: 'Discord',
-                    url: AccountService.loginUrl,
-                    icon:
-                        'https://discordapp.com/assets/28174a34e77bb5e5310ced9f95cb480b.png',
-                },
-            ],
-        }
-    },
-    methods: {
-        openApp() {
-            this.$router.push({ name: 'app' })
+    computed: {
+        isLoggedIn(): boolean {
+            return AccountService.isLoggedIn()
         },
-    },
-    async mounted() {
-        this.isLoggedIn = await AccountService.isLoggedIn()
+        loginRoute(): string {
+            return this.isLoggedIn ? 'app' : 'login'
+        },
+        loginLabel(): string {
+            return this.isLoggedIn ? 'Open' : 'Login'
+        },
     },
 })
 </script>
 
 <style scoped>
-.container {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    background: #1d1d1d;
-    font-size: 1.143em;
-    word-spacing: 1px;
-    -ms-text-size-adjust: 100%;
-    -webkit-text-size-adjust: 100%;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
+.item {
+    padding: 0.35em 0;
+    font-size: 1em;
+    border: 3px solid transparent;
+    border-top: 0;
+    border-right: 0;
 }
 
-.container .content,
-.container .side {
-    flex: 1;
-}
-
-.container .content {
-    padding: 1.2em 1.4em;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    justify-content: space-between;
-}
-
-.container .middle {
-    align-self: center;
-    text-align: center;
-}
-
-.container .slogan {
-    font-weight: 900;
-    font-size: 1.8em;
-    /* border-bottom: 4px solid #fff; */
-    margin-bottom: 1.6em;
-    font-family: Arial;
-}
-
-.container .side {
-    background-image: url('~/assets/sakura.jpg');
-    background-size: cover;
-    background-position: center;
-    filter: grayscale(40%);
-}
-
-.btns {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: -1em;
-}
-
-.btn {
-    padding: 0.6em 1em;
-    font-size: 0.9em;
-    font-weight: 500;
+.loginBtn {
+    background: #cb4164;
+    border-color: #9e2343;
     border-radius: 4px;
-    border: 0;
+    padding: 0.35em 0.7em;
     color: #fff;
+    font-family: Roboto;
+    font-weight: 500;
+    font-weight: bold;
     cursor: pointer;
-    display: inline-flex;
+    transition: 300ms;
+}
+
+.loginBtn:hover {
+    background: #b03b59;
+}
+
+.content {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    margin-bottom: 1em;
-}
-.btn.open {
-    background-color: #f27878;
-    font-size: 1.1em;
-}
-.btn.discord {
-    background-color: #7389da;
 }
 
-.btn img {
-    width: 24px;
-    height: 24px;
-    margin-right: 1em;
+.content .left,
+.content .right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    width: 50%;
 }
 
-.sakuraLogo {
-    justify-content: flex-start;
+.content .left {
+    font-size: 1.8em;
 }
-.footer {
-    text-align: left;
-    font-size: 0.8em;
-    color: rgb(90, 90, 90);
+
+.content .right {
+    align-items: center;
 }
-.footer a {
-    color: rgb(130, 130, 130);
+
+.slogan {
+    font-weight: 900;
+    font-family: Arial;
+    margin-bottom: 1.6em;
+}
+
+.signInBtn {
+    font-size: 0.9em;
+    font-weight: 300;
+    text-transform: lowercase;
+    padding-bottom: 0.3em;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+    border-bottom: 2px solid #fff;
+    transition: 300ms;
+}
+
+.signInBtn:hover {
+    color: #ec4d75;
+    border-color: #ec4d75;
 }
 </style>
