@@ -35,13 +35,4 @@ export function emojify(
     })
 }
 
-/*export function emojify(
-    el: HTMLElement,
-    opts?: Partial<ParseObject>
-): string | void {
-    el.innerText = emoji.emojify(el.innerText)
-
-    return twemojify(el, opts)
-}*/
-
 export default emoji

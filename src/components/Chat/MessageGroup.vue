@@ -1,7 +1,7 @@
 <template>
     <div class="group">
         <div class="avatar">
-            <Avatar :src="group.author.avatar" :size="40" />
+            <UserAvatar :user="group.author" :size="40" />
         </div>
         <div class="body">
             <div class="author">
@@ -13,7 +13,7 @@
                     :key="message.id"
                     :class="{ unsent: !message.id }"
                 >
-                    {{ message.content }}
+                    <MessageContent :content="message.content" />
                 </div>
             </div>
         </div>
@@ -22,10 +22,14 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import Avatar from '../Avatar.vue'
+import UserAvatar from '../User/Avatar.vue'
+import MessageContent from './MessageContent.vue'
 
 export default defineComponent({
-    components: { Avatar },
+    components: {
+        UserAvatar,
+        MessageContent,
+    },
     props: {
         group: Object,
     },
@@ -40,18 +44,9 @@ export default defineComponent({
 }
 
 .group .avatar {
-    background-size: cover;
-    background-position: center;
-    border-radius: 50%;
-    margin-right: 0.7em;
-    width: 40px;
-    height: 40px;
+    margin-right: 0.5em;
 }
-.group .avatar img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-}
+
 .group .name {
     color: lightgrey;
 }
