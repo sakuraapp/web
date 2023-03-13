@@ -188,6 +188,15 @@ export const actions: ActionTree<RoomState, RootState> = {
             d: userId,
         })
     },
+    async requestVM(store) {
+        const roomId = store.state.info.id
+
+        try {
+            await axios.post(`/rooms/${roomId}/vm`)
+        } catch (err) {
+            console.error(err)
+        }
+    },
 }
 
 export default actions

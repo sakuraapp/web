@@ -83,6 +83,8 @@ export class Client extends EventEmitter {
             this.socket.addEventListener('message', (evt) => {
                 const data = this.deserialize(evt.data)
 
+                console.log(data)
+
                 this.handle(data)
             })
 

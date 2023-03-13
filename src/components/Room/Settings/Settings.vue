@@ -19,7 +19,9 @@
                 @change="updateType"
             />
             <div class="buttons">
-                <button>Request a VM</button>
+                <button @click="requestVM" :disabled="vmRequestBusy">
+                    Request a VM
+                </button>
                 <button class="applyBtn" @click="save">
                     Save
                     <span>
@@ -58,6 +60,7 @@ export default defineComponent({
         return {
             name: info.name,
             isPrivate: info.private,
+            vmRequestBusy: false,
         }
     },
     computed: {
@@ -85,6 +88,13 @@ export default defineComponent({
                 name: this.name,
                 private: this.isPrivate,
             })
+        },
+        async requestVM(): Promise<void> {
+            if (this.vmRequestBusy) return
+
+            this.vmRequestBusy = true
+            await this.$store.dispatch('room/requestVM')
+            this.vmRequestBusy = false
         },
     },
 })
